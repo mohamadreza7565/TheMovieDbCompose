@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MovieDbCompose</string>
+    <string name="error_connection_to_server">خطا در اتصال به اینترنت</string>
 </resources>

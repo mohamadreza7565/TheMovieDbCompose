@@ -6,7 +6,7 @@ package com.mohammadreza.moviedbcompose.global
  */
 object ScreenConst {
 
-    const val POPULAR_SCREEN = "${ScreenRouteConst.POPULAR_MOVIES}"
-    const val DETAILS_SCREEN = "${ScreenRouteConst.DETAILS_MOVIE}"
+    const val POPULAR_SCREEN = "POPULAR_MOVIES"
+    const val DETAILS_SCREEN = "DETAILS_MOVIE/{id}"
 
 }

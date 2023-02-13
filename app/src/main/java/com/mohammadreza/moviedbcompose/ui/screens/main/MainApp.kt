@@ -1,14 +1,16 @@
 package com.mohammadreza.moviedbcompose.ui.screens.main
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mohammadreza.moviedbcompose.global.ScreenConst
-import com.mohammadreza.moviedbcompose.global.ScreenRouteConst
+import com.mohammadreza.moviedbcompose.ui.components.LoadingScreen
 import com.mohammadreza.moviedbcompose.ui.screens.details.DetailsScreen
 import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularListScreen
 
@@ -22,12 +24,25 @@ import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularListScreen
 fun MainApp() {
 
     val navController = rememberNavController()
+    var loadingState by remember { mutableStateOf(false) }
+    var routeState by remember { mutableStateOf(ScreenConst.POPULAR_SCREEN) }
 
     Scaffold(
-        content = {
+        content = { innerPadding ->
             Navigation(
                 navController = navController,
+                mLoadingStateListener = {
+                    loadingState = it
+                }
             )
+
+            LoadingScreen(
+                navController = navController,
+                route = routeState,
+                modifier = Modifier.padding(innerPadding),
+                visible = loadingState
+            )
+
         }
     )
 
@@ -35,7 +50,8 @@ fun MainApp() {
 
 @Composable
 fun Navigation(
-    navController: NavHostController
+    navController: NavHostController,
+    mLoadingStateListener: (Boolean) -> Unit
 ) {
 
 
@@ -45,18 +61,27 @@ fun Navigation(
     ) {
 
         composable(
-            route = ScreenRouteConst.POPULAR_MOVIES
+            route = ScreenConst.POPULAR_SCREEN,
         ) { navBackStackEntry ->
 
-            PopularListScreen(navController)
+
+
+            PopularListScreen(
+                navController = navController,
+                mLoadingStateListener = mLoadingStateListener
+            )
 
         }
 
         composable(
-            route = ScreenRouteConst.DETAILS_MOVIE
+            route = ScreenConst.DETAILS_SCREEN
         ) { navBackStackEntry ->
 
-            DetailsScreen()
+            val id = navController.previousBackStackEntry?.savedStateHandle?.get<Int>("id")
+
+            id?.let {
+                DetailsScreen(it)
+            }
 
         }
 

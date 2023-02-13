@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.mohammadreza.moviedbcompose.global.ScreenConst
 import com.mohammadreza.moviedbcompose.ui.theme.DarkBlue
 
@@ -16,18 +17,33 @@ import com.mohammadreza.moviedbcompose.ui.theme.DarkBlue
  *  Site: https://seniorandroid.ir
  */
 
-fun NavController.openMovieDetails() {
-    navigate(ScreenConst.DETAILS_SCREEN)
+fun NavController.openMovieDetails(id:Int) {
+
+    currentBackStackEntry?.savedStateHandle?.apply {
+        set(
+            "id",
+            id
+        )
+    }
+
+    navigate(route = ScreenConst.DETAILS_SCREEN){
+
+
+    // reselecting the same item
+    launchSingleTop = true
+    // Restore state when reselecting a previously selected item
+    restoreState = true
+    }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun DetailsScreen() {
+fun DetailsScreen(id:Int) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize().background(DarkBlue),
         content = {
-            Text(text = "Hi")
+            Text(text = "Hi - $id")
         })
 
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.mohammadreza.moviedbcompose.core.di.interceptor.HeaderInterceptor
+import com.mohammadreza.moviedbcompose.BuildConfig
 import com.mohammadreza.moviedbcompose.core.di.interceptor.NetworkInterceptor
 import com.mohammadreza.moviedbcompose.core.di.interceptor.OfflineInterceptor
 import okhttp3.Cache
@@ -26,7 +27,7 @@ fun createBaseNetworkClient(gson: Gson) = retrofitClient(gson)
 
 private fun retrofitClient(gson: Gson): Retrofit =
     Retrofit.Builder()
-        .baseUrl("BuildConfig.URL_API")
+        .baseUrl(BuildConfig.BASE_URL)
         .client(getOkHttpClient())
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()

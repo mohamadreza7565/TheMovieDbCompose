@@ -5,9 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,19 +19,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.mohammadreza.moviedbcompose.BuildConfig
 import com.mohammadreza.moviedbcompose.global.sdp
 import com.mohammadreza.moviedbcompose.ui.theme.BlackLight
 import com.mohammadreza.moviedbcompose.R
-import com.mohammadreza.moviedbcompose.global.ScreenConst
-import com.mohammadreza.moviedbcompose.global.ScreenRouteConst
-import com.mohammadreza.moviedbcompose.ui.screens.details.DetailsScreen
+import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
+import com.mohammadreza.moviedbcompose.data.model.MovieModel
 import com.mohammadreza.moviedbcompose.ui.screens.details.openMovieDetails
 import com.mohammadreza.moviedbcompose.ui.theme.Dimens
 import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
+import org.koin.androidx.compose.getViewModel
 
 /**
  * Create by Mohammadreza Allahgholi
@@ -38,16 +39,52 @@ import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PopularListScreen(navController: NavHostController) {
+fun PopularListScreen(
+    navController: NavHostController,
+    mViewModel: PopularViewModel = getViewModel(),
+    mLoadingStateListener: (Boolean) -> Unit
+) {
+
+    LaunchedEffect(Unit) {
+        if (mViewModel.popularMovies == BaseApiDataState.Loading)
+            mViewModel.getPopular()
+    }
+
+    mLoadingStateListener.invoke(mViewModel.popularMovies is BaseApiDataState.Loading)
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = { ToolbarView() },
-        content = {
-            MovieList(mOnItemClickListener = {
-                navController.openMovieDetails()
-            })
+        content = { padding ->
+
+            mViewModel.popularMovies.let {
+                when (it) {
+
+                    is BaseApiDataState.Success -> {
+                        it.data?.movies?.let {
+                            if (it.isEmpty()) {
+                                // show empty
+                            } else {
+                                MovieList(list = it, mOnItemClickListener = { id ->
+                                    navController.openMovieDetails(id)
+                                })
+                            }
+                        } ?: run {
+                            // show error
+                        }
+                    }
+
+                    is BaseApiDataState.Error -> {
+                        // show error
+                    }
+
+                    else -> {}
+
+                }
+            }
+
+
         }
     )
 
@@ -96,11 +133,11 @@ private fun ToolbarView() {
 
 @Composable
 fun MovieList(
-    mOnItemClickListener: () -> Unit
+    list: ArrayList<MovieModel>,
+    mOnItemClickListener: (id: Int) -> Unit
 ) {
 
     LazyVerticalGrid(
-        userScrollEnabled = false,
         modifier = Modifier
             .background(Color(0xFF2f2c2b))
             .fillMaxSize(),
@@ -108,28 +145,17 @@ fun MovieList(
         contentPadding = PaddingValues(Dimens.standard_margin_small),
         content = {
 
-            item {
-                PopularMovieItem(mOnItemClickListener)
+            items(list) {
+                PopularMovieItem(it, mOnItemClickListener)
             }
-            item {
-                PopularMovieItem(mOnItemClickListener)
-            }
-            item {
-                PopularMovieItem(mOnItemClickListener)
-            }
-            item {
-                PopularMovieItem(mOnItemClickListener)
-            }
-            item {
-                PopularMovieItem(mOnItemClickListener)
-            }
+
         })
 
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
+private fun PopularMovieItem(item: MovieModel, mOnItemClickListener: (id: Int) -> Unit) {
 
     Card(modifier = Modifier
         .fillMaxWidth()
@@ -137,7 +163,7 @@ private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
         .padding(Dimens.standard_margin_very_small),
         backgroundColor = BlackLight,
         onClick = {
-            mOnItemClickListener.invoke()
+            mOnItemClickListener.invoke(item.id)
         }, content = {
             Column(
                 content = {
@@ -145,7 +171,7 @@ private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
                         modifier = Modifier
                             .height(130.sdp)
                             .fillMaxWidth(),
-                        model = "https://engineerit93.ir/files/cover.jpg",
+                        model = BuildConfig.BASE_IMAGE_URL + item.posterPath,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                     )
@@ -159,7 +185,7 @@ private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
                         contentAlignment = Alignment.Center,
                         content = {
                             Text(
-                                text = "item 1",
+                                text = item.originalTitle,
                                 textAlign = TextAlign.Center,
                                 fontSize = Dimens.text_h5,
                                 color = MaterialTheme.colors.background
@@ -172,5 +198,7 @@ private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PopularListScreenPreview() {
-    PopularListScreen(rememberNavController())
+    PopularListScreen(rememberNavController(), mLoadingStateListener = {
+
+    })
 }

@@ -14,7 +14,7 @@ android {
         targetSdk 33
         versionCode 1
         versionName "1.0"
-
+        flavorDimensions  "server"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -27,6 +27,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    // Specifies one flavor dimension.
+    flavorDimensions "version"
+    productFlavors {
+
+        flavorDimensions {
+            dimension "version"
+            buildConfigField "String", "BASE_URL", "${STAGING_BASE_URL}"
+            buildConfigField "String", "BASE_IMAGE_URL", "${STAGING_BASE_IMAGE_URL}"
+            buildConfigField "String", "API_KEY", "${STAGING_API_KEY}"
+        }
+
+
+
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

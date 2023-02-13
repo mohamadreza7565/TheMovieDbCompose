@@ -1,7 +1,10 @@
 package com.mohammadreza.moviedbcompose.core.base
 
-import androidx.annotation.StringRes
 
+/**
+ * Create by Mohammadreza Allahgholi
+ *  Site: https://seniorandroid.ir
+ */
 class BaseException(
     val type: Type,
     val serverMessage: String? = null,

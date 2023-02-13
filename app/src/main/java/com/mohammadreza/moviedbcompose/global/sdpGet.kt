@@ -9,6 +9,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
+/**
+ * Create by Mohammadreza Allahgholi
+ *  Site: https://seniorandroid.ir
+ */
 @Composable
 private fun Int.sdpGet(): Dp {
 

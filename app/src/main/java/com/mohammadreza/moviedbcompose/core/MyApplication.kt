@@ -1,9 +1,15 @@
 package com.mohammadreza.moviedbcompose.core
 
 import android.app.Application
+import com.mohammadreza.moviedbcompose.core.di.gsonModule
+import com.mohammadreza.moviedbcompose.core.di.networkModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
+/**
+ * Create by Mohammadreza Allahgholi
+ *  Site: https://seniorandroid.ir
+ */
 class MyApplication : Application() {
 
 
@@ -12,6 +18,9 @@ class MyApplication : Application() {
 
         startKoin {
             androidContext(this@MyApplication)
+            modules (
+                listOf(gsonModule, networkModule)
+            )
         }
 
     }

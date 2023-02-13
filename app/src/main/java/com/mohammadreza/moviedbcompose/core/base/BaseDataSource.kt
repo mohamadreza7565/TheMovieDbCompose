@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.flow
 import org.koin.java.KoinJavaComponent
 import retrofit2.Response
 
-
+/**
+ * Create by Mohammadreza Allahgholi
+ *  Site: https://seniorandroid.ir
+ */
 abstract class BaseDataSource {
 
     val mContext: Context by KoinJavaComponent.inject(Context::class.java)

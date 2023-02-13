@@ -16,14 +16,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.mohammadreza.moviedbcompose.global.sdp
 import com.mohammadreza.moviedbcompose.ui.theme.BlackLight
 import com.mohammadreza.moviedbcompose.R
+import com.mohammadreza.moviedbcompose.ui.theme.Black
+import com.mohammadreza.moviedbcompose.ui.theme.Dimens
+import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
 
 /**
  * Create by Mohammadreza Allahgholi
@@ -53,15 +54,24 @@ private fun ToolbarView() {
 
     Row(
         modifier = Modifier
-            .background(Color.Black)
-            .padding(start = 20.sdp, end = 20.sdp, top = 0.sdp, bottom = 0.sdp)
+            .background(ToolbarColor)
+            .padding(
+                start = Dimens.standard_margin_medium,
+                end = Dimens.standard_margin_medium,
+                top = 0.sdp,
+                bottom = 0.sdp
+            )
             .fillMaxWidth()
-            .height(55.sdp),
+            .height(Dimens.toolbar_height),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
-        Text(text = mContext.getString(R.string.popular), style = TextStyle(color = Color.White))
+        Text(
+            text = mContext.getString(R.string.popular),
+            color = Color.White,
+            fontSize = Dimens.text_h3
+        )
 
         AsyncImage(
             modifier = Modifier
@@ -86,8 +96,9 @@ fun MovieList() {
             .background(Color(0xFF2f2c2b))
             .fillMaxSize(),
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(4.dp),
+        contentPadding = PaddingValues(Dimens.standard_margin_small),
         content = {
+
             item {
                 PopularMovieItem()
             }
@@ -112,30 +123,33 @@ private fun PopularMovieItem() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.sdp)
-            .padding(4.sdp)
+            .height(180.sdp)
+            .padding(Dimens.standard_margin_very_small)
             .background(BlackLight),
         content = {
 
             AsyncImage(
                 modifier = Modifier
-                    .height(110.sdp)
-                    .fillMaxWidth()
-                    .clip(CircleShape),
-                model = "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg",
+                    .height(130.sdp)
+                    .fillMaxWidth(),
+                model = "https://engineerit93.ir/files/cover.jpg",
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
 
             Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 4.sdp, end = 4.sdp),
+                .padding(
+                    start = Dimens.standard_margin_small,
+                    end = Dimens.standard_margin_small
+                ),
                 contentAlignment = Alignment.Center,
                 content = {
                     Text(
                         text = "item 1",
                         textAlign = TextAlign.Center,
-                        style = TextStyle(color = MaterialTheme.colors.background)
+                        fontSize = Dimens.text_h5,
+                        color = MaterialTheme.colors.background
                     )
                 })
         })

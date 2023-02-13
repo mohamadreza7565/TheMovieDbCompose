@@ -10,11 +10,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
-private fun Int.sdpGet(): Dp {
+private fun Int.sspGet(): Dp {
 
     val id = when (this) {
-        in 1..600 -> "_${this}sdp"
-        in (-60..-1) -> "_minus${this}sdp"
+        in 1..600 -> "_${this}ssp"
+        in (-60..-1) -> "_minus${this}ssp"
         else -> return this.dp
     }
 
@@ -30,7 +30,14 @@ private fun getFieldId(id: String): Int {
 
 }
 
-val Int.sdp: Dp
+val Int.ssp: Dp
     @Composable
-    get() = this.sdpGet()
+    get() = this.sspGet()
 
+@Composable
+private fun Int.textssp(density: Density): TextUnit = with(density) {
+    this@textssp.ssp.toSp()
+}
+
+val Int.textSsp: TextUnit
+    @Composable get() = this.textssp(density = LocalDensity.current)

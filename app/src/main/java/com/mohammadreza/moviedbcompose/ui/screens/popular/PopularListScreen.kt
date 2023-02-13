@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,11 +16,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.mohammadreza.moviedbcompose.global.sdp
 import com.mohammadreza.moviedbcompose.ui.theme.BlackLight
 import com.mohammadreza.moviedbcompose.R
-import com.mohammadreza.moviedbcompose.ui.theme.Black
+import com.mohammadreza.moviedbcompose.global.ScreenConst
+import com.mohammadreza.moviedbcompose.global.ScreenRouteConst
+import com.mohammadreza.moviedbcompose.ui.screens.details.DetailsScreen
+import com.mohammadreza.moviedbcompose.ui.screens.details.openMovieDetails
 import com.mohammadreza.moviedbcompose.ui.theme.Dimens
 import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
 
@@ -33,14 +38,16 @@ import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun PopularListScreen() {
+fun PopularListScreen(navController: NavHostController) {
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = { ToolbarView() },
         content = {
-            MovieList()
+            MovieList(mOnItemClickListener = {
+                navController.openMovieDetails()
+            })
         }
     )
 
@@ -88,7 +95,9 @@ private fun ToolbarView() {
 
 
 @Composable
-fun MovieList() {
+fun MovieList(
+    mOnItemClickListener: () -> Unit
+) {
 
     LazyVerticalGrid(
         userScrollEnabled = false,
@@ -100,57 +109,62 @@ fun MovieList() {
         content = {
 
             item {
-                PopularMovieItem()
+                PopularMovieItem(mOnItemClickListener)
             }
             item {
-                PopularMovieItem()
+                PopularMovieItem(mOnItemClickListener)
             }
             item {
-                PopularMovieItem()
+                PopularMovieItem(mOnItemClickListener)
             }
             item {
-                PopularMovieItem()
+                PopularMovieItem(mOnItemClickListener)
             }
             item {
-                PopularMovieItem()
+                PopularMovieItem(mOnItemClickListener)
             }
         })
 
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun PopularMovieItem() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(180.sdp)
-            .padding(Dimens.standard_margin_very_small)
-            .background(BlackLight),
-        content = {
+private fun PopularMovieItem(mOnItemClickListener: () -> Unit) {
 
-            AsyncImage(
-                modifier = Modifier
-                    .height(130.sdp)
-                    .fillMaxWidth(),
-                model = "https://engineerit93.ir/files/cover.jpg",
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-            )
-
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    start = Dimens.standard_margin_small,
-                    end = Dimens.standard_margin_small
-                ),
-                contentAlignment = Alignment.Center,
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(180.sdp)
+        .padding(Dimens.standard_margin_very_small),
+        backgroundColor = BlackLight,
+        onClick = {
+            mOnItemClickListener.invoke()
+        }, content = {
+            Column(
                 content = {
-                    Text(
-                        text = "item 1",
-                        textAlign = TextAlign.Center,
-                        fontSize = Dimens.text_h5,
-                        color = MaterialTheme.colors.background
+                    AsyncImage(
+                        modifier = Modifier
+                            .height(130.sdp)
+                            .fillMaxWidth(),
+                        model = "https://engineerit93.ir/files/cover.jpg",
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
                     )
+
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            start = Dimens.standard_margin_small,
+                            end = Dimens.standard_margin_small
+                        ),
+                        contentAlignment = Alignment.Center,
+                        content = {
+                            Text(
+                                text = "item 1",
+                                textAlign = TextAlign.Center,
+                                fontSize = Dimens.text_h5,
+                                color = MaterialTheme.colors.background
+                            )
+                        })
                 })
         })
 }
@@ -158,5 +172,5 @@ private fun PopularMovieItem() {
 @Preview(showBackground = true)
 @Composable
 fun PopularListScreenPreview() {
-    PopularListScreen()
+    PopularListScreen(rememberNavController())
 }

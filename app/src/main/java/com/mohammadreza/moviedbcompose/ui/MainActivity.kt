@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mohammadreza.moviedbcompose.core.base.BaseComposeActivity
+import com.mohammadreza.moviedbcompose.ui.screens.main.MainApp
 import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularListScreen
 import com.mohammadreza.moviedbcompose.ui.theme.MovieDbComposeTheme
 
@@ -26,7 +27,7 @@ class MainActivity : BaseComposeActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    PopularListScreen()
+                    MainApp()
                 }
             }
         }
@@ -37,6 +38,6 @@ class MainActivity : BaseComposeActivity() {
 @Composable
 fun DefaultPreview() {
     MaterialTheme {
-        PopularListScreen()
+        MainApp()
     }
 }

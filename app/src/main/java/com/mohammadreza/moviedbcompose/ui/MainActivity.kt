@@ -1,4 +1,4 @@
-package com.mohammadreza.moviedbcompose
+package com.mohammadreza.moviedbcompose.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,32 +10,33 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mohammadreza.moviedbcompose.core.base.BaseComposeActivity
+import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularListScreen
 import com.mohammadreza.moviedbcompose.ui.theme.MovieDbComposeTheme
 
 class MainActivity : BaseComposeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MovieDbComposeTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    Greeting("Android")
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    PopularListScreen()
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    MovieDbComposeTheme {
-        Greeting("Android")
+    MaterialTheme {
+        PopularListScreen()
     }
 }

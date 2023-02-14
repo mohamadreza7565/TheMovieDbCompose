@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.compose.ui.graphics.Color
+import com.mohammadreza.moviedbcompose.ui.theme.Black
 
 /**
  * Create by Mohammadreza Allahgholi
@@ -20,19 +19,15 @@ import androidx.navigation.NavDestination.Companion.hierarchy
  */
 
 @Composable
-fun LoadingScreen(
-    navController: NavController,
-    route: String,
+fun FillLoadingScreen(
     modifier: Modifier,
-    visible: Boolean
+    color: Color = Black,
+    visible: Boolean,
 ) {
-
-    val isCurrentlyRoute =
-        navController.currentDestination?.hierarchy?.any { it.route == route } == true
 
     AnimatedVisibility(
         modifier = modifier,
-        visible = if (!isCurrentlyRoute) false else visible,
+        visible = visible,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
@@ -41,7 +36,31 @@ fun LoadingScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CircularProgressIndicator()
+            CircularProgressIndicator(color = color)
+        }
+    }
+
+}
+
+@Composable
+fun PaginationLoadingScreen(
+    modifier: Modifier,
+    color: Color = Black,
+    visible: Boolean
+) {
+
+
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(color = color)
         }
     }
 

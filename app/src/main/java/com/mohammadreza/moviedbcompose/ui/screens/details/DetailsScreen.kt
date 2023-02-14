@@ -3,8 +3,6 @@ package com.mohammadreza.moviedbcompose.ui.screens.details
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.util.Log
-import android.widget.ImageButton
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.keyframes
@@ -18,19 +16,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,13 +44,11 @@ import com.mohammadreza.moviedbcompose.R
 import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
 import com.mohammadreza.moviedbcompose.data.model.MovieModel
 import com.mohammadreza.moviedbcompose.global.ScreenConst
-import com.mohammadreza.moviedbcompose.global.ScreenController
 import com.mohammadreza.moviedbcompose.global.ScreenController.removeStatusBar
-import com.mohammadreza.moviedbcompose.global.ScreenController.showStatusBar
 import com.mohammadreza.moviedbcompose.global.sdp
+import com.mohammadreza.moviedbcompose.ui.components.PaginationLoadingScreen
 import com.mohammadreza.moviedbcompose.ui.theme.*
 import org.koin.androidx.compose.getViewModel
-import org.koin.androidx.compose.inject
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent
 
@@ -80,7 +73,6 @@ fun NavController.openMovieDetails(id: Int) {
 @Composable
 fun DetailsScreen(
     id: Int,
-    mLoadingStateListener: (Boolean) -> Unit,
     navController: NavHostController,
     mViewModel: DetailsViewModel = getViewModel(
         parameters = { parametersOf(id) }
@@ -103,15 +95,13 @@ fun DetailsScreen(
         animationSpec = keyframes { durationMillis = 1 })
 
 
-    mLoadingStateListener.invoke(mViewModel.movieDetails is BaseApiDataState.Loading)
-
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBlue),
         content = {
 
+            PaginationLoadingScreen(modifier = Modifier.fillMaxSize(), visible = mViewModel.movieDetails is BaseApiDataState.Loading)
 
             mViewModel.movieDetails.let {
                 when (it) {

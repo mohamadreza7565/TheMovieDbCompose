@@ -1,5 +1,6 @@
 package com.mohammadreza.moviedbcompose.core.di
 
+import com.mohammadreza.moviedbcompose.ui.screens.details.DetailsViewModel
 import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -10,5 +11,6 @@ import org.koin.dsl.module
  */
 val viewModelModule = module {
     viewModel { PopularViewModel(get())}
+    viewModel { DetailsViewModel(get())}
 }
 

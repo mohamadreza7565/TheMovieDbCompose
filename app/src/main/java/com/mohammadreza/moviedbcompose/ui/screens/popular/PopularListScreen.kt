@@ -1,6 +1,7 @@
 package com.mohammadreza.moviedbcompose.ui.screens.popular
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -8,28 +9,39 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Filter1
+import androidx.compose.material.icons.filled.Filter2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mohammadreza.moviedbcompose.BuildConfig
 import com.mohammadreza.moviedbcompose.global.sdp
-import com.mohammadreza.moviedbcompose.ui.theme.BlackLight
 import com.mohammadreza.moviedbcompose.R
 import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
 import com.mohammadreza.moviedbcompose.data.model.MovieModel
+import com.mohammadreza.moviedbcompose.global.ScreenController.removeStatusBar
+import com.mohammadreza.moviedbcompose.global.ScreenController.showStatusBar
 import com.mohammadreza.moviedbcompose.ui.screens.details.openMovieDetails
-import com.mohammadreza.moviedbcompose.ui.theme.Dimens
-import com.mohammadreza.moviedbcompose.ui.theme.ToolbarColor
+import com.mohammadreza.moviedbcompose.ui.theme.*
 import org.koin.androidx.compose.getViewModel
 
 /**
@@ -44,6 +56,12 @@ fun PopularListScreen(
     mViewModel: PopularViewModel = getViewModel(),
     mLoadingStateListener: (Boolean) -> Unit
 ) {
+
+    val systemUiController: SystemUiController = rememberSystemUiController()
+
+    systemUiController.setStatusBarColor(color = DarkBlue)
+    val activity = LocalContext.current as Activity
+    activity.showStatusBar(color = DarkBlue.toArgb())
 
     LaunchedEffect(Unit) {
         if (mViewModel.popularMovies == BaseApiDataState.Loading)
@@ -117,15 +135,21 @@ private fun ToolbarView() {
             fontSize = Dimens.text_h3
         )
 
-        AsyncImage(
+        IconButton(
             modifier = Modifier
-                .height(25.sdp)
-                .width(25.sdp)
+                .height(36.dp)
+                .width(36.dp)
                 .clip(CircleShape),
-            model = R.drawable.ic_filter_left,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
+            onClick = {
+
+            })
+        {
+            Icon(
+                painter = painterResource(R.drawable.ic_filter_left),
+                contentDescription = "",
+                tint = White,
+            )
+        }
 
     }
 }
@@ -198,7 +222,5 @@ private fun PopularMovieItem(item: MovieModel, mOnItemClickListener: (id: Int) -
 @Preview(showBackground = true)
 @Composable
 fun PopularListScreenPreview() {
-    PopularListScreen(rememberNavController(), mLoadingStateListener = {
-
-    })
+    ToolbarView()
 }

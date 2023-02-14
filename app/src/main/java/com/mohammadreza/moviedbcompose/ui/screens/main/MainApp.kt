@@ -65,7 +65,6 @@ fun Navigation(
         ) { navBackStackEntry ->
 
 
-
             PopularListScreen(
                 navController = navController,
                 mLoadingStateListener = mLoadingStateListener
@@ -78,11 +77,11 @@ fun Navigation(
         ) { navBackStackEntry ->
 
             val id = navController.previousBackStackEntry?.savedStateHandle?.get<Int>("id")
-
-            id?.let {
-                DetailsScreen(it)
-            }
-
+            DetailsScreen(
+                id = id ?: 0,
+                mLoadingStateListener = mLoadingStateListener,
+                navController = navController
+            )
         }
 
     }

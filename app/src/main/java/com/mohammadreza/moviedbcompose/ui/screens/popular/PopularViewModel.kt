@@ -19,6 +19,10 @@ class PopularViewModel(private val mMovieRepo: MovieRepo) : BaseViewModel() {
 
     var popularMovies by mutableStateOf<BaseApiDataState<PopularModel>>(BaseApiDataState.Loading)
 
+    init {
+        getPopular()
+    }
+
     fun getPopular() {
 
         viewModelScope.launch {

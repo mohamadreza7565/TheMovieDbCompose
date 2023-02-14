@@ -1,10 +1,17 @@
 package com.mohammadreza.moviedbcompose.ui.screens.main
 
-import android.annotation.SuppressLint
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,8 +25,6 @@ import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularListScreen
  * Create by Mohammadreza Allahgholi
  *  Site: https://seniorandroid.ir
  */
-
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun MainApp() {
 
@@ -32,6 +37,7 @@ fun MainApp() {
             Navigation(
                 navController = navController,
                 mLoadingStateListener = {
+                    routeState = navController.currentDestination?.route!!
                     loadingState = it
                 }
             )
@@ -47,6 +53,7 @@ fun MainApp() {
     )
 
 }
+
 
 @Composable
 fun Navigation(
@@ -75,7 +82,6 @@ fun Navigation(
         composable(
             route = ScreenConst.DETAILS_SCREEN
         ) { navBackStackEntry ->
-
             val id = navController.previousBackStackEntry?.savedStateHandle?.get<Int>("id")
             DetailsScreen(
                 id = id ?: 0,
@@ -85,4 +91,6 @@ fun Navigation(
         }
 
     }
+
+
 }

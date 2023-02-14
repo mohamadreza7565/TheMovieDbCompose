@@ -9,19 +9,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.Filter1
-import androidx.compose.material.icons.filled.Filter2
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -29,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -38,7 +30,6 @@ import com.mohammadreza.moviedbcompose.global.sdp
 import com.mohammadreza.moviedbcompose.R
 import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
 import com.mohammadreza.moviedbcompose.data.model.MovieModel
-import com.mohammadreza.moviedbcompose.global.ScreenController.removeStatusBar
 import com.mohammadreza.moviedbcompose.global.ScreenController.showStatusBar
 import com.mohammadreza.moviedbcompose.ui.screens.details.openMovieDetails
 import com.mohammadreza.moviedbcompose.ui.theme.*
@@ -62,11 +53,6 @@ fun PopularListScreen(
     systemUiController.setStatusBarColor(color = DarkBlue)
     val activity = LocalContext.current as Activity
     activity.showStatusBar(color = DarkBlue.toArgb())
-
-    LaunchedEffect(Unit) {
-        if (mViewModel.popularMovies == BaseApiDataState.Loading)
-            mViewModel.getPopular()
-    }
 
     mLoadingStateListener.invoke(mViewModel.popularMovies is BaseApiDataState.Loading)
 

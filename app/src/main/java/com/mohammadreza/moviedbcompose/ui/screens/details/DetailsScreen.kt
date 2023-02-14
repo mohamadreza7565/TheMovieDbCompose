@@ -15,11 +15,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +44,10 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mohammadreza.moviedbcompose.BuildConfig
 import com.mohammadreza.moviedbcompose.R
+import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
+import com.mohammadreza.moviedbcompose.data.model.MovieModel
 import com.mohammadreza.moviedbcompose.global.ScreenConst
 import com.mohammadreza.moviedbcompose.global.ScreenController
 import com.mohammadreza.moviedbcompose.global.ScreenController.removeStatusBar
@@ -53,6 +56,7 @@ import com.mohammadreza.moviedbcompose.global.sdp
 import com.mohammadreza.moviedbcompose.ui.theme.*
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.inject
+import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent
 
 /**
@@ -78,7 +82,9 @@ fun DetailsScreen(
     id: Int,
     mLoadingStateListener: (Boolean) -> Unit,
     navController: NavHostController,
-    mViewModel: DetailsViewModel = getViewModel(),
+    mViewModel: DetailsViewModel = getViewModel(
+        parameters = { parametersOf(id) }
+    ),
 ) {
 
     val systemUiController: SystemUiController = rememberSystemUiController()
@@ -97,31 +103,51 @@ fun DetailsScreen(
         animationSpec = keyframes { durationMillis = 1 })
 
 
+    mLoadingStateListener.invoke(mViewModel.movieDetails is BaseApiDataState.Loading)
+
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkBlue),
         content = {
 
-            Box(modifier = Modifier.fillMaxWidth(), content = {
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState),
-                    content = {
-                        HeaderScreen()
-                        DividerScreen()
-                        DetailsRateScreen()
-                        DividerScreen()
-                        OverViewScreen()
+            mViewModel.movieDetails.let {
+                when (it) {
+                    is BaseApiDataState.Success -> {
 
-                    })
+                        it.data?.let {
+                            Box(modifier = Modifier.fillMaxWidth(), content = {
+
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .verticalScroll(scrollState),
+                                    content = {
+                                        HeaderScreen(it)
+                                        DividerScreen()
+                                        DetailsRateScreen(it)
+                                        DividerScreen()
+                                        OverViewScreen(it.overview)
+
+                                    })
 
 
-                ToolbarScreen(alpha, tint, navController)
+                                ToolbarScreen(alpha, tint, navController)
 
-            })
+                            })
+                        } ?: run {
+                            // show error
+                        }
+
+                    }
+                    is BaseApiDataState.Error -> {
+                        // show error
+                    }
+                    else -> {}
+                }
+            }
 
 
         })
@@ -232,7 +258,7 @@ private fun DividerScreen() {
 }
 
 @Composable
-private fun OverViewScreen() {
+private fun OverViewScreen(overview: String) {
 
     val mContext = LocalContext.current
 
@@ -248,7 +274,7 @@ private fun OverViewScreen() {
 
         Spacer(modifier = Modifier.height(Dimens.standard_margin_medium))
 
-        Text(text = mContext.getString(R.string.lorem))
+        Text(text = overview)
 
         Spacer(modifier = Modifier.height(Dimens.standard_margin_big))
 
@@ -257,7 +283,9 @@ private fun OverViewScreen() {
 }
 
 @Composable
-fun DetailsRateScreen() {
+fun DetailsRateScreen(model: MovieModel) {
+
+    val mContext: Context by KoinJavaComponent.inject(Context::class.java)
 
     Row(modifier = Modifier.fillMaxWidth(),
         content = {
@@ -265,7 +293,7 @@ fun DetailsRateScreen() {
             Column(
                 modifier = Modifier
                     .aspectRatio(1.5f)
-                    .padding(start = Dimens.standard_margin_medium)
+                    .padding(start = Dimens.standard_margin_small)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -275,30 +303,38 @@ fun DetailsRateScreen() {
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-                    Text(text = "8.2")
+                    Text(
+                        text = "${model.voteAverage}",
+                        fontSize = Dimens.text_h5,
+                        fontFamily = FontFamily(Font(boldFont))
+                    )
 
                     Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
 
-                    AsyncImage(
-                        modifier = Modifier
-                            .height(25.sdp)
-                            .width(25.sdp),
-                        model = R.drawable.ic_filter_left,
-                        colorFilter = ColorFilter.tint(Black),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
+                    Box(modifier = Modifier
+                        .height(15.sdp)
+                        .width(15.sdp), content = {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Default.Star),
+                            contentDescription = "",
+                            tint = Black,
+                        )
+                    })
 
                 }
 
-                Text(text = "10192 Votes", fontSize = Dimens.text_h5, color = Gray)
+                Text(
+                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                    text = "${model.voteCount} ${mContext.getString(R.string.votes)}",
+                    fontSize = Dimens.text_h5,
+                    color = Gray
+                )
 
             }
 
             Column(
                 modifier = Modifier
                     .aspectRatio(1.5f)
-                    .padding(start = Dimens.standard_margin_medium)
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -309,24 +345,32 @@ fun DetailsRateScreen() {
                 ) {
 
 
-                    AsyncImage(
-                        modifier = Modifier
-                            .height(25.sdp)
-                            .width(25.sdp),
-                        model = R.drawable.ic_filter_left,
-                        colorFilter = ColorFilter.tint(Black),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
-
+                    Box(modifier = Modifier
+                        .height(15.sdp)
+                        .width(15.sdp), content = {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Default.Language),
+                            contentDescription = "",
+                            tint = Black,
+                        )
+                    })
 
                     Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
 
-                    Text(text = "8.2")
+                    Text(
+                        text = mContext.getString(R.string.language),
+                        fontSize = Dimens.text_h5,
+                        fontFamily = FontFamily(Font(boldFont))
+                    )
 
                 }
 
-                Text(text = "10192 Votes", fontSize = Dimens.text_h5, color = Gray)
+                Text(
+                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                    text = model.originalLanguage,
+                    fontSize = Dimens.text_h5,
+                    color = Gray
+                )
 
             }
 
@@ -334,8 +378,7 @@ fun DetailsRateScreen() {
                 modifier = Modifier
                     .aspectRatio(1.5f)
                     .padding(
-                        end = Dimens.standard_margin_medium,
-                        start = Dimens.standard_margin_medium
+                        end = Dimens.standard_margin_small,
                     )
                     .weight(1f),
                 verticalArrangement = Arrangement.Center,
@@ -347,24 +390,34 @@ fun DetailsRateScreen() {
                 ) {
 
 
-                    AsyncImage(
-                        modifier = Modifier
-                            .height(25.sdp)
-                            .width(25.sdp),
-                        model = R.drawable.ic_filter_left,
-                        colorFilter = ColorFilter.tint(Black),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
+                    Box(modifier = Modifier
+                        .height(15.sdp)
+                        .width(15.sdp), content = {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Outlined.Timer),
+                            contentDescription = "",
+                            tint = Black,
+                        )
+                    })
 
                     Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
 
-                    Text(text = "8.2")
+                    Text(
+                        text = model.releaseDate,
+                        fontSize = Dimens.text_h5,
+                        fontFamily = FontFamily(Font(boldFont))
+                    )
 
 
                 }
 
-                Text(text = "10192 Votes", fontSize = Dimens.text_h5, color = Gray)
+
+                Text(
+                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                    text = mContext.getString(R.string.release_date),
+                    fontSize = Dimens.text_h5,
+                    color = Gray
+                )
 
             }
 
@@ -375,7 +428,7 @@ fun DetailsRateScreen() {
 
 
 @Composable
-private fun HeaderScreen() {
+private fun HeaderScreen(model: MovieModel) {
 
     ConstraintLayout(
         modifier = Modifier
@@ -392,7 +445,7 @@ private fun HeaderScreen() {
                 .constrainAs(cover) {
                     top.linkTo(parent.top)
                 },
-            model = "https://engineerit93.ir/files/cover_2.jpg",
+            model = BuildConfig.BASE_IMAGE_URL + model.backdropPath,
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )
@@ -419,7 +472,7 @@ private fun HeaderScreen() {
                     start.linkTo(poster.end, margin = titleAndTagsMargin)
                 }
         ) {
-            Text(text = "Title", fontFamily = FontFamily(Font(boldFont)))
+            Text(text = model.originalTitle, fontFamily = FontFamily(Font(boldFont)))
 
             Row {
                 Text(text = "Tags")
@@ -442,7 +495,7 @@ private fun HeaderScreen() {
             }) {
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
-                model = "https://engineerit93.ir/files/cover.jpg",
+                model = BuildConfig.BASE_IMAGE_URL + model.posterPath,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
@@ -455,7 +508,7 @@ private fun HeaderScreen() {
 @Preview(showBackground = true)
 @Composable
 fun DetailsScreenPreview() {
-    ToolbarScreen(1f, Color.Black.toArgb(), rememberNavController())
+    ToolbarScreen(alpha = 1f, tint = Black.toArgb(), navController = rememberNavController())
 }
 
 fun getTintWithScroll(alpha: Float): Int {

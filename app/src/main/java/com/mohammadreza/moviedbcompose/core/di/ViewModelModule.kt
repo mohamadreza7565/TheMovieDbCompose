@@ -10,7 +10,7 @@ import org.koin.dsl.module
  *  Site: https://seniorandroid.ir
  */
 val viewModelModule = module {
-    viewModel { PopularViewModel(get())}
-    viewModel { DetailsViewModel(get())}
+    viewModel { PopularViewModel(get()) }
+    viewModel { (id: Int) -> DetailsViewModel(get(),id = id) }
 }
 

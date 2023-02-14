@@ -110,7 +110,7 @@ private fun ToolbarView(
                 .width(36.dp)
                 .clip(CircleShape),
             onClick = {
-                navController.openMovieDetails(102)
+                navController.openMovieDetails(505642)
             })
         {
             Icon(

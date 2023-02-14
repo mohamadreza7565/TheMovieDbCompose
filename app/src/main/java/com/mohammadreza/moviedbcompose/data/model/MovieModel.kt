@@ -13,7 +13,7 @@ data class MovieModel(
     @SerializedName("budget")
     val budget: Int,
     @SerializedName("genres")
-    val genres: List<Genre>,
+    val genres: ArrayList<Genre>,
     @SerializedName("homepage")
     val homepage: String,
     @SerializedName("id")
@@ -31,9 +31,9 @@ data class MovieModel(
     @SerializedName("poster_path")
     val posterPath: String,
     @SerializedName("production_companies")
-    val productionCompanies: List<ProductionCompany>,
+    val productionCompanies: ArrayList<ProductionCompany>,
     @SerializedName("production_countries")
-    val productionCountries: List<ProductionCountry>,
+    val productionCountries: ArrayList<ProductionCountry>,
     @SerializedName("release_date")
     val releaseDate: String,
     @SerializedName("revenue")
@@ -41,7 +41,7 @@ data class MovieModel(
     @SerializedName("runtime")
     val runtime: Int,
     @SerializedName("spoken_languages")
-    val spokenLanguages: List<SpokenLanguage>,
+    val spokenLanguages: ArrayList<SpokenLanguage>,
     @SerializedName("status")
     val status: String,
     @SerializedName("tagline")

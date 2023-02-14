@@ -6,10 +6,16 @@ import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.keyframes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,25 +34,29 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.mohammadreza.moviedbcompose.BuildConfig
 import com.mohammadreza.moviedbcompose.R
 import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
+import com.mohammadreza.moviedbcompose.data.model.Genre
 import com.mohammadreza.moviedbcompose.data.model.MovieModel
 import com.mohammadreza.moviedbcompose.global.ScreenConst
 import com.mohammadreza.moviedbcompose.global.ScreenController.removeStatusBar
 import com.mohammadreza.moviedbcompose.global.sdp
-import com.mohammadreza.moviedbcompose.ui.components.PaginationLoadingScreen
+import com.mohammadreza.moviedbcompose.ui.components.FillLoadingScreen
 import com.mohammadreza.moviedbcompose.ui.theme.*
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -61,8 +71,7 @@ fun NavController.openMovieDetails(id: Int) {
 
     currentBackStackEntry?.savedStateHandle?.apply {
         set(
-            "id",
-            id
+            "id", id
         )
     }
 
@@ -74,9 +83,7 @@ fun NavController.openMovieDetails(id: Int) {
 fun DetailsScreen(
     id: Int,
     navController: NavHostController,
-    mViewModel: DetailsViewModel = getViewModel(
-        parameters = { parametersOf(id) }
-    ),
+    mViewModel: DetailsViewModel = getViewModel(parameters = { parametersOf(id) }),
 ) {
 
     val systemUiController: SystemUiController = rememberSystemUiController()
@@ -86,61 +93,59 @@ fun DetailsScreen(
 
     val scrollState = rememberScrollState()
 
-    val alpha by animateFloatAsState(
-        targetValue = scrollState.value / 250f,
+    val alpha by animateFloatAsState(targetValue = scrollState.value / 250f,
         animationSpec = keyframes { durationMillis = 1 })
 
-    val tint by animateIntAsState(
-        targetValue = getTintWithScroll(alpha),
+    val tint by animateIntAsState(targetValue = getTintWithScroll(alpha),
         animationSpec = keyframes { durationMillis = 1 })
 
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DarkBlue),
-        content = {
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .background(DarkBlue), content = {
 
-            PaginationLoadingScreen(modifier = Modifier.fillMaxSize(), visible = mViewModel.movieDetails is BaseApiDataState.Loading)
+        FillLoadingScreen(
+            modifier = Modifier.fillMaxSize(),
+            visible = mViewModel.movieDetails is BaseApiDataState.Loading
+        )
 
-            mViewModel.movieDetails.let {
-                when (it) {
-                    is BaseApiDataState.Success -> {
+        mViewModel.movieDetails.let {
+            when (it) {
+                is BaseApiDataState.Success -> {
 
-                        it.data?.let {
-                            Box(modifier = Modifier.fillMaxWidth(), content = {
+                    it.data?.let {
+                        Box(modifier = Modifier.fillMaxWidth(), content = {
 
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .verticalScroll(scrollState),
-                                    content = {
-                                        HeaderScreen(it)
-                                        DividerScreen()
-                                        DetailsRateScreen(it)
-                                        DividerScreen()
-                                        OverViewScreen(it.overview)
+                            Column(modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(scrollState),
+                                content = {
+                                    HeaderScreen(it)
+                                    DividerScreen()
+                                    DetailsRateScreen(it)
+                                    DividerScreen()
+                                    OverViewScreen(it.overview)
 
-                                    })
+                                })
 
 
-                                ToolbarScreen(alpha, tint, navController)
+                            ToolbarScreen(alpha, tint, navController)
 
-                            })
-                        } ?: run {
-                            // show error
-                        }
-
-                    }
-                    is BaseApiDataState.Error -> {
+                        })
+                    } ?: run {
                         // show error
                     }
-                    else -> {}
+
                 }
+                is BaseApiDataState.Error -> {
+                    // show error
+                }
+                else -> {}
             }
+        }
 
 
-        })
+    })
 
 }
 
@@ -167,20 +172,19 @@ private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostControl
                     .background(White)
             )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+            Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 content = {
 
-                    IconButton(
-                        modifier = Modifier
-                            .height(36.dp)
-                            .width(36.dp)
-                            .clip(CircleShape),
+                    IconButton(modifier = Modifier
+                        .height(36.dp)
+                        .width(36.dp)
+                        .clip(CircleShape),
                         onClick = {
                             navController.popBackStack()
-                        }, content = {
+                        },
+                        content = {
                             Icon(
                                 painter = rememberVectorPainter(image = Icons.Default.ArrowBack),
                                 contentDescription = "",
@@ -189,21 +193,20 @@ private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostControl
                         })
 
                     Row(
-                        modifier = Modifier
-                            .height(Dimens.toolbar_height),
+                        modifier = Modifier.height(Dimens.toolbar_height),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
 
-                        IconButton(
-                            modifier = Modifier
-                                .height(36.dp)
-                                .width(36.dp)
-                                .clip(CircleShape),
+                        IconButton(modifier = Modifier
+                            .height(36.dp)
+                            .width(36.dp)
+                            .clip(CircleShape),
                             onClick = {
 
-                            }, content = {
+                            },
+                            content = {
                                 Icon(
                                     painter = rememberVectorPainter(image = Icons.Default.Share),
                                     contentDescription = "",
@@ -213,14 +216,14 @@ private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostControl
 
                         Spacer(modifier = Modifier.width(Dimens.standard_margin_small))
 
-                        IconButton(
-                            modifier = Modifier
-                                .height(36.dp)
-                                .width(36.dp)
-                                .clip(CircleShape),
+                        IconButton(modifier = Modifier
+                            .height(36.dp)
+                            .width(36.dp)
+                            .clip(CircleShape),
                             onClick = {
 
-                            }, content = {
+                            },
+                            content = {
                                 Icon(
                                     painter = rememberVectorPainter(image = Icons.Default.FavoriteBorder),
                                     contentDescription = "",
@@ -277,142 +280,141 @@ fun DetailsRateScreen(model: MovieModel) {
 
     val mContext: Context by KoinJavaComponent.inject(Context::class.java)
 
-    Row(modifier = Modifier.fillMaxWidth(),
-        content = {
+    Row(modifier = Modifier.fillMaxWidth(), content = {
 
-            Column(
-                modifier = Modifier
-                    .aspectRatio(1.5f)
-                    .padding(start = Dimens.standard_margin_small)
-                    .weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier
+                .aspectRatio(1.5f)
+                .padding(start = Dimens.standard_margin_small)
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    Text(
-                        text = "${model.voteAverage}",
-                        fontSize = Dimens.text_h5,
-                        fontFamily = FontFamily(Font(boldFont))
-                    )
-
-                    Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                    Box(modifier = Modifier
-                        .height(15.sdp)
-                        .width(15.sdp), content = {
-                        Icon(
-                            painter = rememberVectorPainter(image = Icons.Default.Star),
-                            contentDescription = "",
-                            tint = Black,
-                        )
-                    })
-
-                }
 
                 Text(
-                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                    text = "${model.voteCount} ${mContext.getString(R.string.votes)}",
+                    text = "${model.voteAverage}",
                     fontSize = Dimens.text_h5,
-                    color = Gray
+                    fontFamily = FontFamily(Font(boldFont))
+                )
+
+                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
+
+                Box(modifier = Modifier
+                    .height(15.sdp)
+                    .width(15.sdp), content = {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Default.Star),
+                        contentDescription = "",
+                        tint = Black,
+                    )
+                })
+
+            }
+
+            Text(
+                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                text = "${model.voteCount} ${mContext.getString(R.string.votes)}",
+                fontSize = Dimens.text_h5,
+                color = Gray
+            )
+
+        }
+
+        Column(
+            modifier = Modifier
+                .aspectRatio(1.5f)
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+
+                Box(modifier = Modifier
+                    .height(15.sdp)
+                    .width(15.sdp), content = {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Default.Language),
+                        contentDescription = "",
+                        tint = Black,
+                    )
+                })
+
+                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
+
+                Text(
+                    text = mContext.getString(R.string.language),
+                    fontSize = Dimens.text_h5,
+                    fontFamily = FontFamily(Font(boldFont))
                 )
 
             }
 
-            Column(
-                modifier = Modifier
-                    .aspectRatio(1.5f)
-                    .weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                text = model.originalLanguage,
+                fontSize = Dimens.text_h5,
+                color = Gray
+            )
+
+        }
+
+        Column(
+            modifier = Modifier
+                .aspectRatio(1.5f)
+                .padding(
+                    end = Dimens.standard_margin_small,
+                )
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
 
 
-                    Box(modifier = Modifier
-                        .height(15.sdp)
-                        .width(15.sdp), content = {
-                        Icon(
-                            painter = rememberVectorPainter(image = Icons.Default.Language),
-                            contentDescription = "",
-                            tint = Black,
-                        )
-                    })
-
-                    Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                    Text(
-                        text = mContext.getString(R.string.language),
-                        fontSize = Dimens.text_h5,
-                        fontFamily = FontFamily(Font(boldFont))
+                Box(modifier = Modifier
+                    .height(15.sdp)
+                    .width(15.sdp), content = {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Outlined.Timer),
+                        contentDescription = "",
+                        tint = Black,
                     )
+                })
 
-                }
+                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
 
                 Text(
-                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                    text = model.originalLanguage,
+                    text = model.releaseDate,
                     fontSize = Dimens.text_h5,
-                    color = Gray
+                    fontFamily = FontFamily(Font(boldFont))
                 )
 
-            }
-
-            Column(
-                modifier = Modifier
-                    .aspectRatio(1.5f)
-                    .padding(
-                        end = Dimens.standard_margin_small,
-                    )
-                    .weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-
-                    Box(modifier = Modifier
-                        .height(15.sdp)
-                        .width(15.sdp), content = {
-                        Icon(
-                            painter = rememberVectorPainter(image = Icons.Outlined.Timer),
-                            contentDescription = "",
-                            tint = Black,
-                        )
-                    })
-
-                    Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                    Text(
-                        text = model.releaseDate,
-                        fontSize = Dimens.text_h5,
-                        fontFamily = FontFamily(Font(boldFont))
-                    )
-
-
-                }
-
-
-                Text(
-                    modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                    text = mContext.getString(R.string.release_date),
-                    fontSize = Dimens.text_h5,
-                    color = Gray
-                )
 
             }
 
 
-        })
+            Text(
+                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+                text = mContext.getString(R.string.release_date),
+                fontSize = Dimens.text_h5,
+                color = Gray
+            )
+
+        }
+
+
+    })
 
 }
 
@@ -443,32 +445,25 @@ private fun HeaderScreen(model: MovieModel) {
 
         val dividerBottomMargin = Dimens.standard_margin_big
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .constrainAs(divider) {
-                    bottom.linkTo(cover.bottom, margin = dividerBottomMargin)
-                }
-        )
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .constrainAs(divider) {
+                bottom.linkTo(cover.bottom, margin = dividerBottomMargin)
+            })
 
 
         val titleAndTagsMargin = Dimens.standard_margin_medium
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .constrainAs(titleAndTags) {
-                    top.linkTo(cover.bottom, margin = titleAndTagsMargin)
-                    start.linkTo(poster.end, margin = titleAndTagsMargin)
-                }
-        ) {
+        Column(modifier = Modifier.constrainAs(titleAndTags) {
+            top.linkTo(cover.bottom, margin = titleAndTagsMargin)
+            start.linkTo(poster.end, margin = titleAndTagsMargin)
+            end.linkTo(parent.end)
+            width = Dimension.fillToConstraints
+        }) {
+
             Text(text = model.originalTitle, fontFamily = FontFamily(Font(boldFont)))
 
-            Row {
-                Text(text = "Tags")
-                Text(text = "Tags")
-                Text(text = "Tags")
-            }
+            GenreListScreen(genre = model.genres)
 
         }
 
@@ -498,7 +493,7 @@ private fun HeaderScreen(model: MovieModel) {
 @Preview(showBackground = true)
 @Composable
 fun DetailsScreenPreview() {
-    ToolbarScreen(alpha = 1f, tint = Black.toArgb(), navController = rememberNavController())
+    GenreItemScreen(genre = Genre(id = 1, name = "Genre"))
 }
 
 fun getTintWithScroll(alpha: Float): Int {
@@ -508,13 +503,11 @@ fun getTintWithScroll(alpha: Float): Int {
     if (alpha < 1) {
         val resultColor = ColorUtils.blendARGB(
             ContextCompat.getColor(
-                mContext,
-                R.color.white
+                mContext, R.color.white
             ),
 
             ContextCompat.getColor(
-                mContext,
-                R.color.black
+                mContext, R.color.black
             ),
 
             alpha
@@ -525,5 +518,43 @@ fun getTintWithScroll(alpha: Float): Int {
         return Color.Black.toArgb()
     }
 
+
+}
+
+@Composable
+fun GenreListScreen(
+    genre: MutableList<Genre>,
+) {
+    FlowRow {
+        genre.forEach {
+            GenreItemScreen(it)
+        }
+    }
+
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun GenreItemScreen(genre: Genre) {
+
+    Card(modifier = Modifier
+        .height(30.sdp)
+        .padding(Dimens.standard_margin_very_small),
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(1.sdp, Gray),
+        backgroundColor = White,
+        onClick = {}) {
+
+        Box(
+            modifier = Modifier.padding(Dimens.standard_margin_small),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                textAlign = TextAlign.Center,
+                text = genre.name,
+            )
+        }
+
+    }
 
 }

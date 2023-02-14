@@ -1,4 +1,4 @@
-package com.mohammadreza.moviedbcompose.ui.screens.main
+package com.mohammadreza.moviedbcompose.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent

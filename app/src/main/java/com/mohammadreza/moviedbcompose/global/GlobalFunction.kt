@@ -26,45 +26,5 @@ object GlobalFunction {
         }
 
 
-    fun shareText(text: String?) {
-
-        val mContext: Context by KoinJavaComponent.inject(Context::class.java)
-
-        text?.let {
-            val sendIntent: Intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(
-                    Intent.EXTRA_TEXT,
-                    text
-                )
-                type = "text/plain"
-            }
-
-            val shareIntent = Intent.createChooser(
-                sendIntent,
-                null
-            )
-            shareIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            mContext.startActivity(shareIntent)
-        }
-    }
-
-    fun openBrowser(link: String?) {
-        val mContext: Context by KoinJavaComponent.inject(Context::class.java)
-        link?.let {
-            var initUrl = it
-            if (!initUrl.startsWith("http://") && !initUrl.startsWith("https://"))
-                initUrl = "http://" + it
-
-            val browserIntent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(initUrl)
-            )
-            browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            mContext.startActivity(browserIntent)
-
-        }
-
-    }
 
 }

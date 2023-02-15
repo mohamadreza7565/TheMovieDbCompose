@@ -92,7 +92,7 @@ internal class PopularListScreenKtTest {
         composeTestRule.setContent {
             DetailsScreen(
                 scrollState = rememberScrollState(),
-                model = MovieFactory().createMokMovie(),
+                model = MovieFactory().createMokMovie(MovieFactory.MovieMokData.DEFAULT),
                 alpha = 0f,
                 tint = White.toArgb(),
                 navController = rememberNavController()

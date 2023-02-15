@@ -6,13 +6,10 @@ import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.keyframes
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -29,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -76,7 +74,7 @@ fun NavController.openMovieDetails(id: Int) {
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun DetailsScreen(
+fun MovieDetailsScreen(
     id: Int,
     navController: NavHostController,
     mViewModel: DetailsViewModel = getViewModel(parameters = { parametersOf(id) }),
@@ -101,7 +99,7 @@ fun DetailsScreen(
         .background(DarkBlue), content = {
 
         FillLoadingScreen(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("MOVIE_DETAILS_LOADING"),
             visible = mViewModel.movieDetails is BaseApiDataState.Loading
         )
 
@@ -110,24 +108,7 @@ fun DetailsScreen(
                 is BaseApiDataState.Success -> {
 
                     it.data?.let {
-                        Box(modifier = Modifier.fillMaxWidth(), content = {
-
-                            Column(modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(scrollState),
-                                content = {
-                                    HeaderScreen(it)
-                                    DividerScreen()
-                                    InformationScreen(it)
-                                    DividerScreen()
-                                    OverViewScreen(it.overview)
-
-                                })
-
-
-                            ToolbarScreen(alpha, tint, navController)
-
-                        })
+                        DetailsScreen(scrollState, it, alpha, tint, navController)
                     } ?: run {
                         // show error
                     }
@@ -146,7 +127,35 @@ fun DetailsScreen(
 }
 
 @Composable
-private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostController) {
+fun DetailsScreen(
+    scrollState: ScrollState,
+    model: MovieModel,
+    alpha: Float,
+    tint: Int,
+    navController: NavHostController
+) {
+    Box(modifier = Modifier.fillMaxWidth(), content = {
+
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+            content = {
+                HeaderScreen(model)
+                DividerScreen()
+                InformationScreen(model)
+                DividerScreen()
+                OverViewScreen(model.overview)
+
+            })
+
+
+        ToolbarScreen(alpha, tint, navController)
+
+    })
+}
+
+@Composable
+fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostController) {
 
     val paddingValues = WindowInsets.systemBars.asPaddingValues()
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -174,6 +183,7 @@ private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostControl
                 content = {
 
                     IconButton(modifier = Modifier
+                        .testTag("DETAILS_BACK_ICON")
                         .height(36.dp)
                         .width(36.dp)
                         .clip(CircleShape),
@@ -237,7 +247,7 @@ private fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostControl
 }
 
 @Composable
-private fun DividerScreen() {
+fun DividerScreen() {
     Spacer(
         modifier = Modifier
             .fillMaxWidth()
@@ -247,7 +257,7 @@ private fun DividerScreen() {
 }
 
 @Composable
-private fun OverViewScreen(overview: String) {
+fun OverViewScreen(overview: String) {
 
     val mContext = LocalContext.current
 
@@ -330,7 +340,7 @@ fun InformationScreen(model: MovieModel) {
 }
 
 @Composable
-private fun InfoWithStartIconTitle(
+fun InfoWithStartIconTitle(
     title: String,
     details: String,
     icon: ImageVector
@@ -370,7 +380,7 @@ private fun InfoWithStartIconTitle(
 }
 
 @Composable
-private fun InfoWithEndIconTitle(
+fun InfoWithEndIconTitle(
     title: String,
     details: String,
     icon: ImageVector
@@ -410,7 +420,7 @@ private fun InfoWithEndIconTitle(
 
 
 @Composable
-private fun HeaderScreen(model: MovieModel) {
+fun HeaderScreen(model: MovieModel) {
 
     ConstraintLayout(
         modifier = Modifier

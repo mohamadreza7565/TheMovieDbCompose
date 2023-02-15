@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
-        google()
-        mavenCentral()
-        jcenter()
         gradlePluginPortal()
+        google()
+        jcenter()
+        mavenCentral()
         maven { url "https://jitpack.io" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }

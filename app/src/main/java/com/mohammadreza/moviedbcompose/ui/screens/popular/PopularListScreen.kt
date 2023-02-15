@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -106,6 +107,7 @@ private fun ToolbarView(
 
         IconButton(
             modifier = Modifier
+                .testTag("FILTER_ICON")
                 .height(36.dp)
                 .width(36.dp)
                 .clip(CircleShape),
@@ -180,7 +182,7 @@ fun MovieList(
         )
 
         FillLoadingScreen(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier.align(Alignment.BottomCenter).testTag("POPULAR_LOADING"),
             visible = loadingState,
             color = White
         )

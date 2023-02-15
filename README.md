@@ -8,7 +8,7 @@
 
 # Architecture #
 MVVM (Model View ViewModel)
-  ->[Document](https://medium.com/swlh/understanding-mvvm-architecture-in-android-aa66f7e1a70b)
+  -> [Document](https://medium.com/swlh/understanding-mvvm-architecture-in-android-aa66f7e1a70b)
 
 # Design pattern used #
 * SingleTon

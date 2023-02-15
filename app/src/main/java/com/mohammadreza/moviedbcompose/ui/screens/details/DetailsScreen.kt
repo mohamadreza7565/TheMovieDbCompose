@@ -9,10 +9,6 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +25,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +40,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.systemuicontroller.SystemUiController
@@ -122,7 +118,7 @@ fun DetailsScreen(
                                 content = {
                                     HeaderScreen(it)
                                     DividerScreen()
-                                    DetailsRateScreen(it)
+                                    InformationScreen(it)
                                     DividerScreen()
                                     OverViewScreen(it.overview)
 
@@ -276,7 +272,7 @@ private fun OverViewScreen(overview: String) {
 }
 
 @Composable
-fun DetailsRateScreen(model: MovieModel) {
+fun InformationScreen(model: MovieModel) {
 
     val mContext: Context by KoinJavaComponent.inject(Context::class.java)
 
@@ -290,38 +286,11 @@ fun DetailsRateScreen(model: MovieModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-                Text(
-                    text = "${model.voteAverage}",
-                    fontSize = Dimens.text_h5,
-                    fontFamily = FontFamily(Font(boldFont))
-                )
-
-                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                Box(modifier = Modifier
-                    .height(15.sdp)
-                    .width(15.sdp), content = {
-                    Icon(
-                        painter = rememberVectorPainter(image = Icons.Default.Star),
-                        contentDescription = "",
-                        tint = Black,
-                    )
-                })
-
-            }
-
-            Text(
-                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                text = "${model.voteCount} ${mContext.getString(R.string.votes)}",
-                fontSize = Dimens.text_h5,
-                color = Gray
+            InfoWithEndIconTitle(
+                title = "${model.voteAverage}",
+                details = "${model.voteCount} ${mContext.getString(R.string.votes)}",
+                icon = Icons.Default.Star
             )
-
         }
 
         Column(
@@ -331,37 +300,10 @@ fun DetailsRateScreen(model: MovieModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-
-                Box(modifier = Modifier
-                    .height(15.sdp)
-                    .width(15.sdp), content = {
-                    Icon(
-                        painter = rememberVectorPainter(image = Icons.Default.Language),
-                        contentDescription = "",
-                        tint = Black,
-                    )
-                })
-
-                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                Text(
-                    text = mContext.getString(R.string.language),
-                    fontSize = Dimens.text_h5,
-                    fontFamily = FontFamily(Font(boldFont))
-                )
-
-            }
-
-            Text(
-                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                text = model.originalLanguage,
-                fontSize = Dimens.text_h5,
-                color = Gray
+            InfoWithStartIconTitle(
+                title = mContext.getString(R.string.language),
+                details = model.originalLanguage,
+                icon = Icons.Default.Language
             )
 
         }
@@ -376,46 +318,94 @@ fun DetailsRateScreen(model: MovieModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-
-                Box(modifier = Modifier
-                    .height(15.sdp)
-                    .width(15.sdp), content = {
-                    Icon(
-                        painter = rememberVectorPainter(image = Icons.Outlined.Timer),
-                        contentDescription = "",
-                        tint = Black,
-                    )
-                })
-
-                Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
-
-                Text(
-                    text = model.releaseDate,
-                    fontSize = Dimens.text_h5,
-                    fontFamily = FontFamily(Font(boldFont))
-                )
-
-
-            }
-
-
-            Text(
-                modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
-                text = mContext.getString(R.string.release_date),
-                fontSize = Dimens.text_h5,
-                color = Gray
+            InfoWithStartIconTitle(
+                title = mContext.getString(R.string.release_date),
+                details = model.releaseDate,
+                icon = Icons.Outlined.Timer
             )
-
         }
-
 
     })
 
+}
+
+@Composable
+private fun InfoWithStartIconTitle(
+    title: String,
+    details: String,
+    icon: ImageVector
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+
+        Box(modifier = Modifier
+            .height(15.sdp)
+            .width(15.sdp), content = {
+            Icon(
+                painter = rememberVectorPainter(image = icon),
+                contentDescription = "",
+                tint = Black,
+            )
+        })
+
+        Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
+
+        Text(
+            text = title,
+            fontSize = Dimens.text_h5,
+            fontFamily = FontFamily(Font(boldFont))
+        )
+
+    }
+
+    Text(
+        modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+        text = details,
+        fontSize = Dimens.text_h5,
+        color = Gray
+    )
+}
+
+@Composable
+private fun InfoWithEndIconTitle(
+    title: String,
+    details: String,
+    icon: ImageVector
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+        Text(
+            text = title,
+            fontSize = Dimens.text_h5,
+            fontFamily = FontFamily(Font(boldFont))
+        )
+
+        Spacer(modifier = Modifier.width(Dimens.standard_margin_very_small))
+
+        Box(modifier = Modifier
+            .height(15.sdp)
+            .width(15.sdp), content = {
+            Icon(
+                painter = rememberVectorPainter(image = icon),
+                contentDescription = "",
+                tint = Black,
+            )
+        })
+
+    }
+
+    Text(
+        modifier = Modifier.padding(top = Dimens.standard_margin_very_small),
+        text = details,
+        fontSize = Dimens.text_h5,
+        color = Gray
+    )
 }
 
 
@@ -461,7 +451,11 @@ private fun HeaderScreen(model: MovieModel) {
             width = Dimension.fillToConstraints
         }) {
 
-            Text(text = model.originalTitle, fontFamily = FontFamily(Font(boldFont)))
+            Text(
+                modifier = Modifier.padding(end = Dimens.standard_margin_small),
+                text = model.originalTitle,
+                fontFamily = FontFamily(Font(boldFont))
+            )
 
             GenreListScreen(genre = model.genres)
 
@@ -501,7 +495,8 @@ fun getTintWithScroll(alpha: Float): Int {
     val mContext: Context by KoinJavaComponent.inject(Context::class.java)
 
     if (alpha < 1) {
-        val resultColor = ColorUtils.blendARGB(
+
+        return ColorUtils.blendARGB(
             ContextCompat.getColor(
                 mContext, R.color.white
             ),
@@ -512,8 +507,6 @@ fun getTintWithScroll(alpha: Float): Int {
 
             alpha
         )
-
-        return resultColor
     } else {
         return Color.Black.toArgb()
     }
@@ -525,7 +518,12 @@ fun getTintWithScroll(alpha: Float): Int {
 fun GenreListScreen(
     genre: MutableList<Genre>,
 ) {
-    FlowRow {
+    FlowRow(
+        modifier = Modifier.padding(
+            end = Dimens.standard_margin_small,
+            top = Dimens.standard_margin_small
+        )
+    ) {
         genre.forEach {
             GenreItemScreen(it)
         }

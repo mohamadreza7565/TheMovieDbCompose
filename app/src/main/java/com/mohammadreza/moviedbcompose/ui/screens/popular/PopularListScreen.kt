@@ -151,8 +151,6 @@ fun MovieList(
                     }
                 }
 
-                Log.e("TAG", "MovieList : ${movies.loadState}")
-
                 if (movies.loadState.append is LoadState.Loading) {
                     appendLoadingState = true
                     loadingState = false

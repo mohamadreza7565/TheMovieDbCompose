@@ -15,8 +15,6 @@ import retrofit2.Response
  */
 abstract class BaseDataSource {
 
-    val mContext: Context by KoinJavaComponent.inject(Context::class.java)
-
     private suspend fun <T> getResult(call: suspend () -> Response<T>): BaseApiDataState<T> {
         try {
 
@@ -27,7 +25,12 @@ abstract class BaseDataSource {
                 return BaseApiDataState.Success(body)
             }
 
-            return BaseApiDataState.Error(parseErrorModel(response.errorBody() as BaseErrorResponse))
+            return BaseApiDataState.Error(
+                BaseException(
+                    type = BaseException.Type.INTERNET,
+                    serverMessage = "Internet connection error"
+                )
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             logE(
@@ -39,7 +42,7 @@ abstract class BaseDataSource {
                 BaseApiDataState.Error(
                     BaseException(
                         BaseException.Type.INTERNET,
-                        mContext.getString(R.string.error_connection_to_server),
+                        "Internet connection error",
                         0
                     )
                 )

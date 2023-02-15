@@ -16,7 +16,7 @@ interface MovieApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("page") page: Int
-    ): PopularModel
+    ): Response<PopularModel>
 
     @GET("movie/{id}")
     suspend fun getMovieDetails(

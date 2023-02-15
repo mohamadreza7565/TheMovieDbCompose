@@ -26,7 +26,7 @@ import java.util.concurrent.Flow
 class PopularViewModel(private val mMovieRepo: MovieRepo) : BaseViewModel() {
 
     var movies: LazyPagingItems<MovieModel>? = null
-    var popularMovies by mutableStateOf<ArrayList<MovieModel>>(arrayListOf())
+
     fun getPopular() = mMovieRepo.getPopular().cachedIn(viewModelScope)
 
 

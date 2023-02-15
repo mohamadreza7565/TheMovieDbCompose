@@ -13,17 +13,22 @@ class PopularPagingSource(
 ) : PagingSource<Int, MovieModel>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieModel> {
-        return try {
+        try {
             val page = params.key ?: 1
-            val response = mMovieApiService.getPopularMovies(page = page)
+            val response = mMovieApiService.getPopularMovies(page = page).body()
 
-            LoadResult.Page(
-                data = response.movies,
-                prevKey = if (page == 1) null else page.minus(1),
-                nextKey = if (response.movies.isEmpty()) null else page.plus(1),
-            )
+            response?.let {
+                return LoadResult.Page(
+                    data = response.movies,
+                    prevKey = if (page == 1) null else page.minus(1),
+                    nextKey = if (response.movies.isEmpty()) null else page.plus(1),
+                )
+            } ?: kotlin.run {
+                return LoadResult.Error(Exception(""))
+            }
+
         } catch (e: Exception) {
-            LoadResult.Error(e)
+            return LoadResult.Error(Exception(""))
         }
 
     }
@@ -31,5 +36,5 @@ class PopularPagingSource(
     override fun getRefreshKey(state: PagingState<Int, MovieModel>): Int {
         return ((state.anchorPosition ?: 0) - state.config.initialLoadSize / 2)
             .coerceAtLeast(0)
-        }
     }
+}

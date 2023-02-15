@@ -1,13 +1,8 @@
-package com.mohammadreza.moviedbcompose
+package com.mohammadreza.moviedbcompose.unittest
 
 
-import androidx.paging.PagingSource
-import com.google.gson.annotations.SerializedName
 import com.mohammadreza.moviedbcompose.data.api.MovieApiService
 import com.mohammadreza.moviedbcompose.data.model.*
-import com.mohammadreza.moviedbcompose.data.repo.MovieRepo
-import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularPagingSource
-import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularViewModel
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

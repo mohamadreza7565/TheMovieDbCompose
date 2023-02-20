@@ -17,6 +17,14 @@ data class MovieLikeModel(
     val id: Int,
 
     @ColumnInfo(name = "is_liked")
-    val isLiked: Boolean
+    private var isLiked: Boolean
 
-)
+){
+
+    fun setLike(isLiked:Boolean){
+        this.isLiked = isLiked
+    }
+
+    fun getLike() = isLiked
+
+}

@@ -15,7 +15,7 @@ import com.mohammadreza.moviedbcompose.ui.screens.popular.PopularPagingSource
  */
 class MovieRepo(
     private val mMovieApiService: MovieApiService,
-    private val movieDao : MovieDao,
+    private val movieDao: MovieDao,
 ) : BaseDataSource() {
 
     fun getPopular() = Pager(
@@ -29,27 +29,22 @@ class MovieRepo(
 
     fun getMovieDetails(id: Int) = callApi { mMovieApiService.getMovieDetails(id) }
 
-   suspend fun doLike(id: Int) {
+    suspend fun doLike(id: Int) {
 
         movieDao.get(id)?.let {
-            MovieLikeModel(
-                id = id,
-                isLiked = true
-            ).also {
-                movieDao.like(it)
-            }
+            it.setLike(!it.getLike())
+            it
         } ?: kotlin.run {
             MovieLikeModel(
                 id = id,
                 isLiked = true
-            ).also {
-                movieDao.like(it)
-            }
-
+            )
+        }.also {
+            movieDao.like(it)
         }
 
     }
 
-    suspend fun isLiked(id: Int) = movieDao.get(id)?.isLiked ?: false
+    suspend fun isLiked(id: Int) = movieDao.get(id)?.getLike() ?: false
 
 }

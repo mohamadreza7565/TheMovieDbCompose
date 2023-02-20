@@ -8,6 +8,7 @@ import com.mohammadreza.moviedbcompose.core.base.BaseApiDataState
 import com.mohammadreza.moviedbcompose.core.base.BaseViewModel
 import com.mohammadreza.moviedbcompose.data.model.MovieModel
 import com.mohammadreza.moviedbcompose.data.repo.MovieRepo
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 /**
@@ -30,5 +31,13 @@ class DetailsViewModel(private val mMovieRepo: MovieRepo, private val id: Int) :
         }
     }
 
+
+    fun doLike(id: Int) {
+        viewModelScope.launch {
+            mMovieRepo.doLike(id)
+        }
+    }
+
+    suspend fun isLiked(id: Int) = flow { emit(mMovieRepo.isLiked(id)) }
 
 }

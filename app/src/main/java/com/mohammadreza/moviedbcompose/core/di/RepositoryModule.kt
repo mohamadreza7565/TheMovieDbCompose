@@ -11,7 +11,8 @@ import org.koin.dsl.module
 val repositoryModule = module {
     single {
         MovieRepo(
-            mMovieApiService = get()
+            mMovieApiService = get(),
+            movieDao = get ()
         )
     }
 }

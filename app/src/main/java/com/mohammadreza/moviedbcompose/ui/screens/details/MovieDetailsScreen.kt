@@ -14,8 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -99,7 +98,9 @@ fun MovieDetailsScreen(
         .background(DarkBlue), content = {
 
         FillLoadingScreen(
-            modifier = Modifier.fillMaxSize().testTag("MOVIE_DETAILS_LOADING"),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("MOVIE_DETAILS_LOADING"),
             visible = mViewModel.movieDetails is BaseApiDataState.Loading
         )
 
@@ -145,17 +146,34 @@ fun DetailsScreen(
                 InformationScreen(model)
                 DividerScreen()
                 OverViewScreen(model.overview)
-
             })
 
 
-        ToolbarScreen(alpha, tint, navController)
+        ToolbarScreen(alpha, model, tint, navController)
 
     })
 }
 
 @Composable
-fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostController) {
+fun ToolbarScreen(
+    alpha: Float,
+    model: MovieModel,
+    tint: Int,
+    navController: NavHostController,
+    mViewModel: DetailsViewModel = getViewModel()
+) {
+
+    var likedState = remember {
+        mutableStateOf<Boolean?>(null)
+    }
+
+    LaunchedEffect(Unit) {
+        mViewModel.isLiked(model.id).collect {
+            likedState.value = it
+        }
+    }
+
+    var likeIcon = if (likedState.value == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder
 
     val paddingValues = WindowInsets.systemBars.asPaddingValues()
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -227,11 +245,12 @@ fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostController) {
                             .width(36.dp)
                             .clip(CircleShape),
                             onClick = {
-
+                                mViewModel.doLike(id = model.id)
+                                likedState.value = !(likedState.value?:false)
                             },
                             content = {
                                 Icon(
-                                    painter = rememberVectorPainter(image = Icons.Default.FavoriteBorder),
+                                    painter = rememberVectorPainter(image = likeIcon),
                                     contentDescription = "",
                                     tint = Color(tint),
                                 )
@@ -245,6 +264,7 @@ fun ToolbarScreen(alpha: Float, tint: Int, navController: NavHostController) {
     }
 
 }
+
 
 @Composable
 fun DividerScreen() {
